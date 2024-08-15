@@ -2,6 +2,7 @@
   "name": "loan-service",
   "version": "1.0.0",
   "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "start": "nodemon"
   },
@@ -12,6 +13,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@types/express": "^4.17.21",
+    "@types/node": "^22.3.0",
     "@types/nodemon": "^1.19.6",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
