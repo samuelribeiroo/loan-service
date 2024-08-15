@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { customerSchema } from "../schema/customerSchema.js"
-import { handleDetermineLoan } from "../services/loanService.js"
+import { handleLoanRequest } from "../services/loanService.js"
 
 class Loan {
   async request(request: Request, response: Response) {
@@ -12,7 +12,7 @@ class Loan {
 
     const customer = validator.data
 
-    const loans = handleDetermineLoan(customer)
+    const loans = handleLoanRequest(customer)
 
     return response.json({ customer: customer.name, loans }).sendStatus(200)
   }

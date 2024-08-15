@@ -7,7 +7,7 @@ interface LoanRule {
   interestRate: number
 }
 
-export const handleDetermineLoan = (customer: CustomerInfo) => {
+export const handleLoanRequest = (customer: CustomerInfo) => {
   const getLocationCustomer = customer.location.toLowerCase()
 
   const isIncomeElegible = customer.income > 3000 && customer.income <= 5000
