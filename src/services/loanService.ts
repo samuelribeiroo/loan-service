@@ -7,7 +7,7 @@ interface LoanRule {
   interestRate: number
 }
 
-const handleDetermineLoan = (customer: CustomerInfo) => {
+export const handleDetermineLoan = (customer: CustomerInfo) => {
   const getLocationCustomer = customer.location.toLowerCase()
 
   const isIncomeElegible = customer.income > 3000 && customer.income <= 5000
@@ -39,4 +39,13 @@ const handleDetermineLoan = (customer: CustomerInfo) => {
       interestRate: LoansInterestRates.GUARANTEED_LOAN,
     },
   ]
+
+  const applyLoan = loanRulesMatcher
+    .filter(rule => rule.condition(customer))
+    .map(rule => ({
+      type: rule.loanType,
+      interestRate: rule.interestRate
+    }))
+
+  return applyLoan
 }
