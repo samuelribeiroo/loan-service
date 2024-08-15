@@ -1,9 +1,8 @@
 import { Router } from "express"
+import { LoanService } from "../controllers/index.js"
 
 const route: Router = Router()
 
-route.get("/", (request, response) => {
-  return response.json({ message: "Funcionou." })
-})
+route.post("/customer-loans", LoanService.request)
 
 export default route
