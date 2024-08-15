@@ -1,4 +1,4 @@
-export type LoanServcice = "PERSONAL" | "GUARANTEED" | "ASSIGNED"
+export type LoanServcice = "PERSONAL" | "GUARANTEED" | "CONSIGNMENT"
 
 export type LoanReport = {
   customer: string
