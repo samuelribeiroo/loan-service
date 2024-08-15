@@ -1,5 +1,5 @@
-import { LoansInterestRates } from "../constants"
-import { CustomerInfo, LoanServcice } from "../types"
+import { LoansInterestRates } from "../constants/index.js"
+import { CustomerInfo, LoanServcice } from "../types/index.js"
 
 interface LoanRule {
   condition: (customer: CustomerInfo) => boolean
