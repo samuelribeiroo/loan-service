@@ -26,7 +26,7 @@ const handleDetermineLoan = (customer: CustomerInfo) => {
     {
       condition: customer => customer.income >= 5000,
       loanType: "CONSIGNMENT",
-      interestRate: LoansInterestRates.ASSIGNED_LOAN,
+      interestRate: LoansInterestRates.CONSIGNMENT_LOAN,
     },
     {
       condition: customer => isIncomeElegible && customer.age < 30 && getLocationCustomer === "sp",
@@ -36,7 +36,7 @@ const handleDetermineLoan = (customer: CustomerInfo) => {
     {
       condition: customer => isIncomeElegible && customer.age < 30 && getLocationCustomer === "sp",
       loanType: "GUARANTEED",
-      interestRate: LoansInterestRates.PERSONAL_LOAN,
+      interestRate: LoansInterestRates.GUARANTEED_LOAN,
     },
   ]
 }
