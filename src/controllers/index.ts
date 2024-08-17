@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { customerSchema } from "../schema/customerSchema.js"
-import { createCustomer } from "../services/customerService.js"
+import { createCustomer, getAllCustomers } from "../services/customerService.js"
 import { handleLoanRequest } from "../services/loanService.js"
 
 class Customer {
@@ -14,6 +14,16 @@ class Customer {
       return response.sendStatus(201).json({ customer: newCustomer })
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  async index(request: Request, response: Response) {
+    try {
+      const costumersList = await getAllCustomers()
+
+      return response.json({ costumersList }).sendStatus(200)
+    } catch (error) {
+      return response.json({error: `Houve algum erro: ${error}`})
     }
   }
 }

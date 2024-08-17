@@ -1,6 +1,13 @@
 import { Query } from "../database/index.js"
 
-export const createCustomer = async (data: { id: number, name: string, age: number, cpf: string, income: number, location: string }) => {
+export const createCustomer = async (data: {
+  id: number
+  name: string
+  age: number
+  cpf: string
+  income: number
+  location: string
+}) => {
   const createNewCustomer = `INSERT INTO client_register (id, name, age, cpf, income, location)
   VALUES($1, $2, $3, $4, $5, $6)
   RETURNING *
@@ -12,4 +19,14 @@ export const createCustomer = async (data: { id: number, name: string, age: numb
   return getResult[0]
 }
 
-// to run the query above we need create a table with enitities, so for while we won't use.
+export const getAllCustomers = async () => {
+  const getCustomerQuery = `SELECT * FROM client_register`
+
+  try {
+    const handleGetcustomers = Query(getCustomerQuery, [])
+
+    return handleGetcustomers
+  } catch (error) {
+    console.log(`Houve algum erro: ${error}`)
+  }
+}
