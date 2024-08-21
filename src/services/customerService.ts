@@ -1,3 +1,4 @@
+import { ifError } from "assert"
 import { Query } from "../database/index.js"
 
 export const createCustomer = async (data: {
@@ -42,5 +43,29 @@ export const getAllCustomers = async () => {
     return handleGetcustomers
   } catch (error) {
     console.log(`Houve algum erro: ${error}`)
+  }
+}
+
+export const getCustomerByID = async (data: { id: string }) => {
+  try {
+    const getCustomer = "SELECT * FROM client_register WHERE id = $1"
+
+    const execQuery = await Query(getCustomer, [data.id])
+
+    if (execQuery.length === 0) {
+      throw new Error("Cliente não localizado.")
+    }
+
+    return execQuery[0]
+  } catch (error) {
+    if (error instanceof Error) {
+      if ((error.message = "Cliente não localizado")) {
+        throw new Error(error.message)
+      } else {
+        throw new Error("Erro desconhecido ao buscar cliente por ID.")
+      }
+    } else {
+      throw new Error("Erro desconhecido ao buscar cliente por ID.")
+    }
   }
 }
