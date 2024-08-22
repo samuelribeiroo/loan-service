@@ -1,5 +1,4 @@
-import { ifError } from "assert"
-import { Query } from "../database/index.js"
+import { Query } from "../database/index"
 
 export const createCustomer = async (data: {
   name: string
