@@ -70,5 +70,5 @@ class Loan {
   }
 }
 
-export const CustomerService = new Customer()
-export const LoanService = new Loan()
+export const CustomerController = new Customer()
+export const LoanController = new Loan()
