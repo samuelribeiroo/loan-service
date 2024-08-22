@@ -26,7 +26,7 @@ app.get("/customer/:id", async (request, response) => {
 })
 
 describe("getUserById", () => {
-  it("Should return a JSON with user", async () => {
+  it("Should return a JSON with user -> Status code: 200", async () => {
     const mockFakeCustomer: CustomerInfo = {
       id: "ec0d1287-a1dd-4691-8848-10112f11d049",
       name: "Geraldo Lucca Nelson Duarte",
