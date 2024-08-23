@@ -1,4 +1,4 @@
 import { CustomerInfo } from "./customer-info.js"
-import { LoanReport, LoanServcice } from "./loans-types.js"
+import { LoanReport, LoanService } from "./loans-types.js"
 
-export { CustomerInfo, LoanReport, LoanServcice }
+export { CustomerInfo, LoanReport, LoanService }
