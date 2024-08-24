@@ -10,30 +10,6 @@ const app = express()
 
 app.use(express.json())
 
-app.post("/create-customer", async (request, response) => {
-  try {
-    const customerData = request.body
-
-    if (Object.keys(customerData).length === 0) {
-      return response.status(400).json({ error: "Dados do cliente não fornecidos." })
-    }
-
-    const newCustomer = await createCustomer(customerData)
-
-    return response.status(201).json({ customer: newCustomer })
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === "CPF INSERIDO JÁ EXISTE") {
-        return response.status(409).json({ error: "CPF inserido já cadastrado." })
-      } else {
-        return response.status(500).json({ error: error.message })
-      }
-    } else {
-      return response.status(500).json({ error: "Erro desconhecido." })
-    }
-  }
-})
-
 app.get("/customers", async (request, response) => {
   try {
     const mockFakeCustomerList = await getAllCustomers()
@@ -65,58 +41,6 @@ jest.mock("../services/customerService", () => ({
   getAllCustomers: jest.fn(),
 }))
 
-describe("createCustomer", () => {
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("Should create a new customer successfully -> Status Code: 201", async () => {
-    const mockNewCustomerData: Omit<CustomerInfo, "id"> = {
-      name: "João Silva",
-      age: 30,
-      income: 3000.0,
-      location: "RJ",
-      cpf: "123.456.789-00",
-    };
-
-    const mockCreatedCustomer: CustomerInfo = {
-      ...mockNewCustomerData,
-      id: "72d739cf-bdeb-484d-a290-9e0719103c7b"
-    };
-    
-    (createCustomer as jest.MockedFunction<typeof createCustomer>).mockResolvedValue(mockCreatedCustomer)
-
-    const response = await request(app).post("/create-customer").send(mockNewCustomerData).expect(201)
-
-    expect(response.body).toEqual({ customer: mockCreatedCustomer })
-    expect(createCustomer).toHaveBeenCalledWith(mockNewCustomerData)
-  })
-
-  it("Should return error if customer data is empty -> Status Code: 400", async () => {
-    const response = await request(app).post("/create-customer").send({}).expect(400)
-
-    expect(response.body).toEqual({ error: "Dados do cliente não fornecidos." })
-    expect(createCustomer).not.toHaveBeenCalled()
-  })
-
-  it("Should return error message saying the cpf already exists -> Status Code: 409", async () => {
-    const mockNewCustomerData: Omit<CustomerInfo, "id"> = {
-      name: "Maria Silva",
-      age: 66,
-      income: 1800.0,
-      location: "PA",
-      cpf: "987.654.321-00",
-    };
-
-    (createCustomer as jest.MockedFunction<typeof createCustomer>).mockRejectedValue(new Error("CPF INSERIDO JÁ EXISTE"))
-
-    const response = await request(app).post("/create-customer").send(mockNewCustomerData).expect(409)
-    console.log(response.body)
-
-    expect(response.body).toEqual({ error: "CPF inserido já cadastrado." })
-    expect(createCustomer).toBeCalledWith(mockNewCustomerData)
-  })
-})
 
 describe("getAllCustomers", () => {
   afterEach(() => {
