@@ -64,7 +64,11 @@ class Loan {
 
     const customer = validator.data
 
-    const loans = handleLoanRequest(customer)
+   const customerWithoutID = {
+    ...customer
+   } as Omit<typeof customer, 'id'>
+
+    const loans = handleLoanRequest(customerWithoutID)
 
     return response.json({ customer: customer.name, loans }).sendStatus(200)
   }

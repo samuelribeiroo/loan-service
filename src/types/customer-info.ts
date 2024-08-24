@@ -1,5 +1,5 @@
 export type CustomerInfo = {
-  id: string,
+  id?: string,
   name: string
   age: number
   cpf: string
