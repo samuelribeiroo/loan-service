@@ -15,7 +15,7 @@ app.post("/customer-loans", async (request: Request, response: Response) => {
   const validator = customerSchema.safeParse(request.body)
 
   if (!validator.success) {
-    return response.status(404).json({ errors: validator.error.errors }) 
+    return response.status(404).json({ errors: validator.error.errors })
   }
 
   const customer = validator.data
@@ -33,26 +33,26 @@ jest.mock("../services/loanService", () => ({
   handleLoanRequest: jest.fn(),
 }))
 
-describe("handleLoanRequest", () => {
+describe("Customer Loans API -> handleLoanRequest", () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  it("Should return status code 404 if customer data its invalid", async () => {
+  it("Should return status code 404 if customer data is invalid", async () => {
     const mockInvalidCustomer = {
       name: "John Doe",
       age: "invalid",
       income: "invalid",
-      location: 123
+      location: 123,
     }
 
-    const response = await request(app).post('/customer-loans').send(mockInvalidCustomer)
+    const response = await request(app).post("/customer-loans").send(mockInvalidCustomer)
 
     expect(response.status).toBe(404)
-    expect(response.body).toHaveProperty('errors')
+    expect(response.body).toHaveProperty("errors")
   })
 
-  it("Should return GUARANTEED loans", async () => {
+  it("Should return GUARANTEED loan for income equal or higher than 5k", async () => {
     const mockCustomer = {
       age: 26,
       cpf: "275.484.389-23",
@@ -75,5 +75,24 @@ describe("handleLoanRequest", () => {
     })
   })
 
-  // it('Should return PERSONAL and GUARANTEED loans for customer with income <= 3000', async () => {})
+  it("Should return PERSONAL and GUARANTEED loan for customer with income equal or less 3k", async () => {
+    const mockFakeCustomer = {
+      name: "João Silva",
+      age: 28,
+      cpf: "123.456.789-00",
+      income: 28000,
+      location: "SP",
+    };
+    
+    (handleLoanRequest as jest.Mock).mockReturnValue([
+      { type: "PERSONAL", interestRate: LoansInterestRates.PERSONAL_LOAN },
+      { type: "GUARANTEED", interestRate: LoansInterestRates.GUARANTEED_LOAN },
+    ])
+
+    const response = await request(app).post("/customer-loans").send(mockFakeCustomer)
+
+    expect(response.status).toBe(200)
+    expect(handleLoanRequest).toHaveBeenCalledWith(mockFakeCustomer)
+    // to finish this this is missing testing the json return with customer name and available loans...
+  })
 })
