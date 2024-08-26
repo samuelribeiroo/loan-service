@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { customerSchema } from "../schema/customerSchema.js"
-import { createCustomer, getAllCustomers, getCustomerByID } from "../services/customerService.js"
+import { createCustomer, getAllCustomers, getCustomerByID, updateIncomeCustomer } from "../services/customerService.js"
 import { handleLoanRequest } from "../services/loanService.js"
 
 class Customer {
@@ -14,13 +14,13 @@ class Customer {
 
       const newCustomer = await createCustomer(customerData)
 
-      return response.sendStatus(201).json({ customer: newCustomer })
+      return response.status(201).json({ customer: newCustomer })
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === "CPF INSERIDO JÁ EXISTE") {
-          return response.sendStatus(409).json({ error: "CPF inserido já cadastrado." })
+          return response.status(409).json({ error: "CPF inserido já cadastrado." })
         } else {
-          return response.sendStatus(500).json({ error: error.message })
+          return response.status(500).json({ error: error.message })
         }
       } else {
         return response.status(500).json({ error: "Erro desconhecido." })
@@ -32,7 +32,7 @@ class Customer {
     try {
       const costumersList = await getAllCustomers()
 
-      return response.json({ costumersList }).sendStatus(200)
+      return response.status(200).json({ costumersList })
     } catch (error) {
       return response.json({ error: `Houve algum erro: ${error}` })
     }
@@ -44,12 +44,32 @@ class Customer {
       const customer = await getCustomerByID({ id })
 
       if (!customer) {
-        return response.sendStatus(404).json({ error: "Cliente não encontrado" })
+        return response.status(404).json({ error: "Cliente não encontrado" })
       }
 
-      return response.json({ customer }).sendStatus(200)
+      return response.json({ customer }).status(200)
     } catch (error) {
-      return response.sendStatus(404).json({ error: "Cliente não encontrado" })
+      return response.status(404).json({ error: "Cliente não encontrado" })
+    }
+  }
+
+  async update(request: Request, response: Response) {
+    const { income, id} = request.body
+
+    if (!id || typeof income !== "number") {
+      return response.status(400).json({ error: "Os campos ID e income devem estar preenchidos." })
+    }
+
+    try {
+      const execUpdate = await updateIncomeCustomer({ id, income })
+
+      if (!execUpdate) {
+        return response.status(400).json({ errot: "Cliente não encontrado" })
+      }
+
+      return response.status(200).json({ customer: execUpdate })
+    } catch (error) {
+      return response.status(500).json({ error })
     }
   }
 }
@@ -64,13 +84,13 @@ class Loan {
 
     const customer = validator.data
 
-   const customerWithoutID = {
-    ...customer
-   } as Omit<typeof customer, 'id'>
+    const customerWithoutID = {
+      ...customer,
+    } as Omit<typeof customer, "id">
 
     const loans = handleLoanRequest(customerWithoutID)
 
-    return response.json({ customer: customer.name, loans }).sendStatus(200)
+    return response.status(200).json({ customer: customer.name, loans })
   }
 }
 

@@ -68,3 +68,23 @@ export const getCustomerByID = async (data: { id: string }) => {
     }
   }
 }
+
+export const updateIncomeCustomer = async (data: { id: string; income: number }) => {
+  try {
+    const updateIncomeQuery = `UPDATE client_register SET income = $1 WHERE id = $2 RETURNING *`
+
+    const updateIncomeCustomer = await Query(updateIncomeQuery, [data.income, data.id])
+
+    if (updateIncomeCustomer.length === 0) {
+      throw new Error("Cliente não existe no Banco de dados.")
+    }
+
+    return updateIncomeCustomer[0]
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message || "Erro ao atualizar a renda do cliente.")
+    } else {
+      throw new Error("Erro desconhecido ao atualizar a renda do cliente.")
+    }
+  }
+}
