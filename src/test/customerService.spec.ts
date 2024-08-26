@@ -1,7 +1,7 @@
 import { describe, expect, jest } from "@jest/globals"
-import express, {Request, Response} from "express"
+import express, { Request, Response } from "express"
 import request from "supertest"
-import { createCustomer, getAllCustomers, getCustomerByID } from "../services/customerService"
+import { createCustomer, getAllCustomers, getCustomerByID, updateIncomeCustomer } from "../services/customerService"
 import { CustomerInfo } from "../types/index"
 
 jest.setTimeout(8000)
@@ -59,10 +59,31 @@ app.get("/customer/:id", async (request, response) => {
   }
 })
 
+app.put("/update-income", async (request, response) => {
+  const { income, id } = request.body
+
+  if (!id || typeof income !== "number") {
+    return response.status(400).json({ error: "Os campos ID e income devem estar preenchidos." })
+  }
+
+  try {
+    const execUpdate = await updateIncomeCustomer({ income, id })
+
+    if (!execUpdate) {
+      return response.status(400).json({ error: "Cliente não encontrado" })
+    }
+
+    return response.status(200).json({ customer: execUpdate })
+  } catch (error) {
+    return response.status(500).json({ error })
+  }
+})
+
 jest.mock("../services/customerService", () => ({
   createCustomer: jest.fn(),
   getCustomerByID: jest.fn(),
   getAllCustomers: jest.fn(),
+  updateIncomeCustomer: jest.fn(),
 }))
 
 describe("createCustomer", () => {
@@ -77,14 +98,13 @@ describe("createCustomer", () => {
       income: 3000.0,
       location: "RJ",
       cpf: "123.456.789-00",
-    };
+    }
 
     const mockCreatedCustomer: CustomerInfo = {
       ...mockNewCustomerData,
-      id: "72d739cf-bdeb-484d-a290-9e0719103c7b"
-    };
-    
-    (createCustomer as jest.MockedFunction<typeof createCustomer>).mockResolvedValue(mockCreatedCustomer)
+      id: "72d739cf-bdeb-484d-a290-9e0719103c7b",
+    }
+    ;(createCustomer as jest.MockedFunction<typeof createCustomer>).mockResolvedValue(mockCreatedCustomer)
 
     const response = await request(app).post("/create-customer").send(mockNewCustomerData).expect(201)
 
@@ -106,9 +126,10 @@ describe("createCustomer", () => {
       income: 1800.0,
       location: "PA",
       cpf: "987.654.321-00",
-    };
-
-    (createCustomer as jest.MockedFunction<typeof createCustomer>).mockRejectedValue(new Error("CPF INSERIDO JÁ EXISTE"))
+    }
+    ;(createCustomer as jest.MockedFunction<typeof createCustomer>).mockRejectedValue(
+      new Error("CPF INSERIDO JÁ EXISTE"),
+    )
 
     const response = await request(app).post("/create-customer").send(mockNewCustomerData).expect(409)
 
@@ -151,7 +172,7 @@ describe("getAllCustomers", () => {
   })
 
   it("Should return an error message if there is an error fetching customers -> Status Code: 500", async () => {
-    (getAllCustomers as jest.MockedFunction<typeof getAllCustomers>).mockRejectedValue(new Error("Database error."))
+    ;(getAllCustomers as jest.MockedFunction<typeof getAllCustomers>).mockRejectedValue(new Error("Database error."))
 
     const response = await request(app).get("/customers").expect(500)
 
@@ -182,17 +203,66 @@ describe("getCustomerByID", () => {
       income: 1980.0,
       location: "MS",
       cpf: "363.757.821-20",
-    };
+    }
 
     // Disclaimer about used data like name, cpf and location
     // All sensinble data used in this project are provideb by the site 'https://www.4devs.com.br/gerador_de_cpf'
     // And the main purpose of the project are learning, notthing more.
-    
-    (getCustomerByID as jest.MockedFunction<typeof getCustomerByID>).mockResolvedValue(mockFakeCustomer)
+    ;(getCustomerByID as jest.MockedFunction<typeof getCustomerByID>).mockResolvedValue(mockFakeCustomer)
 
     const response = await request(app).get("/customer/ec0d1287-a1dd-4691-8848-10112f11d049").expect(200)
 
     expect(response.body).toEqual({ customer: mockFakeCustomer })
     expect(getCustomerByID).toHaveBeenCalledWith({ id: "ec0d1287-a1dd-4691-8848-10112f11d049" })
+  })
+})
+
+type mockFakeIncomeTypes = {
+  id: string
+  income: number
+}
+
+describe("updateIncomeCustomer", () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("Should return return status 400 if customer was not find", async () => {
+    ;(updateIncomeCustomer as jest.Mock).mockReturnValue(null)
+
+    const response = await request(app)
+      .put("/update-income")
+      .send({ id: "9c529845-fdde-43db-8267-14172b72f967", income: 2500 })
+      .expect(400)
+
+    expect(response.status).toBe(400)
+    expect(response.body.error).toBe("Cliente não encontrado")
+  })
+
+  it("Should return status code 200 if income was uptaded successfully", async () => {
+    const mockFakeCustomer: CustomerInfo = {
+      id: "9c529845-fdde-43db-8267-14172b72f967",
+      name: "João Silva",
+      age: 30,
+      income: 1500.0, // Renda atualizada
+      location: "SP",
+      cpf: "123.456.789-00",
+    }
+
+    const mockUpdated: mockFakeIncomeTypes = {
+      id: "9c529845-fdde-43db-8267-14172b72f967",
+      income: 7800.0,
+    };
+    
+    (updateIncomeCustomer as jest.MockedFunction<typeof updateIncomeCustomer>).mockResolvedValue(mockUpdated)
+
+    const response = await request(app).put("/update-income").send(mockUpdated).expect(200)
+   
+
+    expect(response.body).toEqual({ customer: mockUpdated })
+    expect(response.status).toBe(200)
+    expect(updateIncomeCustomer).toHaveBeenCalledWith(mockUpdated)
+    expect(response.header["content-type"]).toMatch(/json/)
+    expect(response.body.customer.income).not.toBe(mockFakeCustomer.income);
   })
 })
