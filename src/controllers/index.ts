@@ -8,7 +8,9 @@ class Customer {
     try {
       const customerData = request.body
 
-      if (request.body === "") {
+      const hasEmptyProperties = Object.keys(request.body).length === 0
+
+      if (!request.body || hasEmptyProperties) {
         return response.sendStatus(400)
       }
 
@@ -79,7 +81,7 @@ class Loan {
     const validator = customerSchema.safeParse(request.body)
 
     if (!validator.success) {
-      return response.sendStatus(400).json({ errors: validator.error.errors })
+      return response.status(400).json({ errors: validator.error.errors })
     }
 
     const customer = validator.data
