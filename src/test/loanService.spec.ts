@@ -60,7 +60,6 @@ describe("Customer Loans API -> handleLoanRequest", () => {
       income: 7000.0,
       location: "SP",
     }
-
     ;(handleLoanRequest as jest.Mock).mockReturnValue([
       { type: "GUARANTEED", interestRate: LoansInterestRates.GUARANTEED_LOAN },
     ])
@@ -82,9 +81,8 @@ describe("Customer Loans API -> handleLoanRequest", () => {
       cpf: "123.456.789-00",
       income: 28000,
       location: "SP",
-    };
-    
-    (handleLoanRequest as jest.Mock).mockReturnValue([
+    }
+    ;(handleLoanRequest as jest.Mock).mockReturnValue([
       { type: "PERSONAL", interestRate: LoansInterestRates.PERSONAL_LOAN },
       { type: "GUARANTEED", interestRate: LoansInterestRates.GUARANTEED_LOAN },
     ])
@@ -93,6 +91,38 @@ describe("Customer Loans API -> handleLoanRequest", () => {
 
     expect(response.status).toBe(200)
     expect(handleLoanRequest).toHaveBeenCalledWith(mockFakeCustomer)
-    // to finish this this is missing testing the json return with customer name and available loans...
+    expect(response.body).toEqual({
+      customer: mockFakeCustomer.name,
+      loans: [
+        { type: "PERSONAL", interestRate: LoansInterestRates.PERSONAL_LOAN },
+        { type: "GUARANTEED", interestRate: LoansInterestRates.GUARANTEED_LOAN },
+      ],
+    })
+  })
+
+  it("Should return PERSONAL and GUARANTEED loan to customers that attend that following coditions: Income between 3k and 5k and residents at SP under 30yr", async () => {
+    const mockFakeCustomer = {
+      age: 28,
+      cpf: "275.484.389-23",
+      name: "João Silva",
+      income: 4500,
+      location: "SP",
+    }
+    ;(handleLoanRequest as jest.Mock).mockReturnValue([
+      { type: "GUARANTEED", interestRate: LoansInterestRates.GUARANTEED_LOAN },
+      { type: "PERSONAL", interestRate: LoansInterestRates.PERSONAL_LOAN },
+    ])
+
+    const response = await request(app).post("/customer-loans").send(mockFakeCustomer)
+
+    expect(response.status).toBe(200)
+    expect(handleLoanRequest).toHaveBeenCalledWith(mockFakeCustomer)
+    expect(response.body).toEqual({
+      customer: mockFakeCustomer.name,
+      loans: [
+        { type: "GUARANTEED", interestRate: LoansInterestRates.GUARANTEED_LOAN },
+        { type: "PERSONAL", interestRate: LoansInterestRates.PERSONAL_LOAN },
+      ],
+    })
   })
 })
