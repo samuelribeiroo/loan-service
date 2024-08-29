@@ -66,7 +66,7 @@ class Customer {
       const execUpdate = await updateIncomeCustomer({ id, income })
 
       if (!execUpdate) {
-        return response.status(400).json({ errot: "Cliente não encontrado" })
+        return response.status(400).json({ error: "Cliente não encontrado" })
       }
 
       return response.status(200).json({ customer: execUpdate })

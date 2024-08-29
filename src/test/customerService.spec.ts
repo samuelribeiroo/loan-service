@@ -227,7 +227,7 @@ describe("updateIncomeCustomer", () => {
     jest.clearAllMocks()
   })
 
-  it("Should return return status 400 if customer was not find", async () => {
+  it("Should return return error message if customer was not finded -> Status code: 400", async () => {
     ;(updateIncomeCustomer as jest.Mock).mockReturnValue(null)
 
     const response = await request(app)
@@ -239,19 +239,19 @@ describe("updateIncomeCustomer", () => {
     expect(response.body.error).toBe("Cliente não encontrado")
   })
 
-  it("Should return status code 200 if income was uptaded successfully", async () => {
+  it("Should return JSON with data customer if income was uptaded successfully -> Status code: 200", async () => {
     const mockFakeCustomer: CustomerInfo = {
       id: "9c529845-fdde-43db-8267-14172b72f967",
       name: "João Silva",
       age: 30,
-      income: 1500.0, // Renda atualizada
+      income: 1500.0, // Renda Inicial
       location: "SP",
       cpf: "123.456.789-00",
     }
 
     const mockUpdated: mockFakeIncomeTypes = {
       id: "9c529845-fdde-43db-8267-14172b72f967",
-      income: 7800.0,
+      income: 7800.0 // Renda atualizada,
     };
     
     (updateIncomeCustomer as jest.MockedFunction<typeof updateIncomeCustomer>).mockResolvedValue(mockUpdated)
