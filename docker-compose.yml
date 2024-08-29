@@ -1,0 +1,14 @@
+version: '27.0.3'
+
+services:
+  postgres-db:
+    image: postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=process.env.DB_USER
+      - POSTGRES_PASSWORD=process.env.DB_PASSWORD
+      - POSTGRES_DATABASE=clients
+
+# I have not sure if is correct upload docker compose with enviroment variables to GH, so I prefer use ENV sintax...
+# Dev JR problems...
